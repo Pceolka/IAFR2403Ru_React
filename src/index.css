@@ -333,3 +333,137 @@ ul {
     grid-template-columns: 130px 1fr;
   }
 }
+
+/* ---------- Панель фильтров */
+.filters {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.filters__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.2fr 1.4fr;
+  gap: 14px;
+  align-items: end;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.field__label {
+  padding: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.field__control {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.field__control:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.field__range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.filters__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.filters__count {
+  margin-right: auto;
+  color: var(--muted);
+}
+
+.filters__count strong {
+  color: var(--text);
+}
+
+.filters__warning {
+  color: #f0a35e;
+  font-size: 0.88rem;
+}
+
+/* ---------- Состояния */
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 56px 20px;
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.status__text {
+  font-size: 1.05rem;
+}
+
+.status--error {
+  border-color: #c4524b;
+}
+
+.status--error .status__text {
+  color: #f08a83;
+}
+
+.status__spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .filters__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .field--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .filters__grid {
+    grid-template-columns: 1fr;
+  }
+}

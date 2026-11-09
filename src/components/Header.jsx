@@ -5,7 +5,7 @@ function Header({ favoritesCount, totalCount }) {
         <span className="header__logo" aria-hidden="true">▶</span>
         <div>
           <h1 className="header__title">Каталог сериалов</h1>
-          <p className="header__subtitle">Источник данных: TVmaze · записей: {totalCount}</p>
+          <p className="header__subtitle">Источник данных: TVmaze · загружено: {totalCount}</p>
         </div>
       </div>
 
