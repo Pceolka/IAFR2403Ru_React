@@ -1,6 +1,6 @@
 import ShowCard from './ShowCard.jsx';
 
-function ShowList({ shows, favoriteIds, onToggleFavorite, onOpenDetails }) {
+function ShowList({ shows, favoriteIds, onToggleFavorite, onOpenDetails, onEdit, onDelete }) {
   return (
     <ul className="show-list">
       {shows.map((show) => (
@@ -10,6 +10,8 @@ function ShowList({ shows, favoriteIds, onToggleFavorite, onOpenDetails }) {
             isFavorite={favoriteIds.includes(show.id)}
             onToggleFavorite={onToggleFavorite}
             onOpenDetails={onOpenDetails}
+            onEdit={onEdit}
+            onDelete={onDelete}
           />
         </li>
       ))}

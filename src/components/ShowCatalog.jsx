@@ -5,23 +5,30 @@ import StatusMessage from './StatusMessage.jsx';
 import {
   DEFAULT_FILTERS,
   compareShows,
-  getGenreOptions,
   matchesGenre,
   matchesRatingRange,
   matchesSearch,
 } from '../logic/showFilters.js';
 
-function ShowCatalog({ shows, favoriteIds, onToggleFavorite, onOpenDetails }) {
+function ShowCatalog({
+  shows,
+  genreOptions,
+  favoriteIds,
+  onToggleFavorite,
+  onOpenDetails,
+  onEdit,
+  onDelete,
+}) {
   const [search, setSearch] = useState(DEFAULT_FILTERS.search);
   const [genre, setGenre] = useState(DEFAULT_FILTERS.genre);
   const [minRating, setMinRating] = useState(DEFAULT_FILTERS.minRating);
   const [maxRating, setMaxRating] = useState(DEFAULT_FILTERS.maxRating);
   const [sortMode, setSortMode] = useState(DEFAULT_FILTERS.sortMode);
 
-  const genreOptions = useMemo(() => getGenreOptions(shows), [shows]);
-
   // Поиск -> жанр -> диапазон рейтинга -> сортировка.
   // filter() возвращает новый массив, поэтому sort() не меняет исходный shows.
+  // shows приходит из useEntities: после добавления/изменения/удаления это новый
+  // массив, и useMemo пересчитывает результат по актуальным данным.
   const visibleShows = useMemo(() => {
     return shows
       .filter((show) => matchesSearch(show, search))
@@ -63,6 +70,8 @@ function ShowCatalog({ shows, favoriteIds, onToggleFavorite, onOpenDetails }) {
           favoriteIds={favoriteIds}
           onToggleFavorite={onToggleFavorite}
           onOpenDetails={onOpenDetails}
+          onEdit={onEdit}
+          onDelete={onDelete}
         />
       ) : (
         <StatusMessage

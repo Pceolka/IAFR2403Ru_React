@@ -1,46 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Header from './components/Header.jsx';
 import ShowCatalog from './components/ShowCatalog.jsx';
 import ShowDetailsModal from './components/ShowDetailsModal.jsx';
+import ShowFormModal from './components/ShowFormModal.jsx';
 import StatusMessage from './components/StatusMessage.jsx';
-import { fetchShows } from './api/showsApi.js';
+import { useEntities } from './hooks/useEntities.js';
+import { getGenreOptions } from './logic/showFilters.js';
 
 function App() {
-  const [shows, setShows] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  // увеличение счётчика повторяет загрузку (кнопка «Повторить»)
-  const [reloadKey, setReloadKey] = useState(0);
+  const {
+    entities: shows,
+    loading,
+    error,
+    addEntity,
+    updateEntity,
+    removeEntity,
+    reloadEntities,
+    getById,
+  } = useEntities();
 
-  // ID избранных сериалов хранятся отдельно от отфильтрованного списка,
-  // поэтому фильтры не сбрасывают отметки
+  // ID избранных сериалов хранятся отдельно от отфильтрованного списка
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [selectedShowId, setSelectedShowId] = useState(null);
+  // null — форма закрыта; { mode: 'create' } или { mode: 'edit', id }
+  const [formState, setFormState] = useState(null);
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadShows() {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const loadedShows = await fetchShows(controller.signal);
-        setShows(loadedShows);
-      } catch (err) {
-        // отмена запроса при размонтировании — не ошибка
-        if (err.name === 'AbortError') return;
-        setError(err.message || 'Не удалось загрузить данные');
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadShows();
-
-    return () => controller.abort();
-  }, [reloadKey]);
+  const genreOptions = useMemo(() => getGenreOptions(shows), [shows]);
 
   function toggleFavorite(showId) {
     setFavoriteIds((prevIds) =>
@@ -50,10 +35,40 @@ function App() {
     );
   }
 
-  const selectedShow = shows.find((show) => show.id === selectedShowId) ?? null;
+  function openCreateForm() {
+    setFormState({ mode: 'create' });
+  }
+
+  function openEditForm(showId) {
+    setSelectedShowId(null);
+    setFormState({ mode: 'edit', id: showId });
+  }
+
+  function handleFormSubmit(showData) {
+    if (formState.mode === 'edit') {
+      updateEntity(formState.id, showData);
+    } else {
+      addEntity(showData);
+    }
+    setFormState(null);
+  }
+
+  function handleDelete(showId) {
+    const show = getById(showId);
+    if (!show) return;
+    if (!window.confirm(`Удалить сериал «${show.name}»?`)) return;
+
+    removeEntity(showId);
+    // удалённая запись не должна оставаться в счётчике избранного
+    setFavoriteIds((prevIds) => prevIds.filter((id) => id !== showId));
+    if (selectedShowId === showId) setSelectedShowId(null);
+  }
+
+  const selectedShow = selectedShowId === null ? null : getById(selectedShowId);
+  const editedShow = formState?.mode === 'edit' ? getById(formState.id) : null;
 
   let content;
-  if (isLoading) {
+  if (loading) {
     content = <StatusMessage type="loading" text="Загрузка сериалов…" />;
   } else if (error) {
     content = (
@@ -61,23 +76,31 @@ function App() {
         type="error"
         text={`Ошибка загрузки: ${error}`}
         actionLabel="Повторить"
-        onAction={() => setReloadKey((key) => key + 1)}
+        onAction={reloadEntities}
       />
     );
   } else {
     content = (
       <ShowCatalog
         shows={shows}
+        genreOptions={genreOptions}
         favoriteIds={favoriteIds}
         onToggleFavorite={toggleFavorite}
         onOpenDetails={setSelectedShowId}
+        onEdit={openEditForm}
+        onDelete={handleDelete}
       />
     );
   }
 
   return (
     <div className="app">
-      <Header favoritesCount={favoriteIds.length} totalCount={shows.length} />
+      <Header
+        favoritesCount={favoriteIds.length}
+        totalCount={shows.length}
+        canCreate={!loading && !error}
+        onCreate={openCreateForm}
+      />
 
       <main className="app__main">{content}</main>
 
@@ -86,7 +109,19 @@ function App() {
           show={selectedShow}
           isFavorite={favoriteIds.includes(selectedShow.id)}
           onToggleFavorite={toggleFavorite}
+          onEdit={openEditForm}
+          onDelete={handleDelete}
           onClose={() => setSelectedShowId(null)}
+        />
+      )}
+
+      {formState && (
+        <ShowFormModal
+          key={formState.mode === 'edit' ? formState.id : 'create'}
+          show={editedShow}
+          genreOptions={genreOptions}
+          onSubmit={handleFormSubmit}
+          onClose={() => setFormState(null)}
         />
       )}
     </div>

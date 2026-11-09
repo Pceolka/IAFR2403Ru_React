@@ -7,7 +7,7 @@ import {
   translateStatus,
 } from '../logic/formatShow.js';
 
-function ShowDetailsModal({ show, isFavorite, onToggleFavorite, onClose }) {
+function ShowDetailsModal({ show, isFavorite, onToggleFavorite, onEdit, onDelete, onClose }) {
   const details = [
     ['Жанры', show.genres.join(', ') || '—'],
     ['Язык', show.language ?? '—'],
@@ -60,6 +60,12 @@ function ShowDetailsModal({ show, isFavorite, onToggleFavorite, onClose }) {
                 isFavorite={isFavorite}
                 onToggle={() => onToggleFavorite(show.id)}
               />
+              <button type="button" className="button button--secondary" onClick={() => onEdit(show.id)}>
+                Изменить
+              </button>
+              <button type="button" className="button button--danger" onClick={() => onDelete(show.id)}>
+                Удалить
+              </button>
               <button type="button" className="button button--secondary" onClick={onClose}>
                 Закрыть
               </button>
