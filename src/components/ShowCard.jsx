@@ -1,15 +1,20 @@
+import { Link } from 'react-router';
 import PosterImage from './PosterImage.jsx';
 import FavoriteButton from './FavoriteButton.jsx';
 import { formatRating, getYear, translateStatus } from '../logic/formatShow.js';
 
-function ShowCard({ show, isFavorite, onToggleFavorite, onOpenDetails, onEdit, onDelete }) {
+function ShowCard({ show, isFavorite, onToggleFavorite, onDelete }) {
   return (
     <article className={`show-card${isFavorite ? ' show-card--favorite' : ''}`}>
-      <PosterImage src={show.image} alt={`Постер: ${show.name}`} />
+      <Link to={`/entity/${show.id}`} className="show-card__poster-link" tabIndex={-1} aria-hidden="true">
+        <PosterImage src={show.image} alt="" />
+      </Link>
 
       <div className="show-card__body">
         <h2 className="show-card__title">
-          {show.name}
+          <Link to={`/entity/${show.id}`} className="show-card__link">
+            {show.name}
+          </Link>
           {show.isLocal && <span className="badge">добавлен</span>}
         </h2>
         <p className="show-card__genres">{show.genres.join(' · ')}</p>
@@ -30,21 +35,17 @@ function ShowCard({ show, isFavorite, onToggleFavorite, onOpenDetails, onEdit, o
         </dl>
 
         <div className="show-card__actions">
-          <button
-            type="button"
-            className="button button--secondary"
-            onClick={() => onOpenDetails(show.id)}
-          >
+          <Link to={`/entity/${show.id}`} className="button button--secondary">
             Подробнее
-          </button>
+          </Link>
           <FavoriteButton
             isFavorite={isFavorite}
             onToggle={() => onToggleFavorite(show.id)}
           />
           <div className="show-card__crud">
-            <button type="button" className="button button--small" onClick={() => onEdit(show.id)}>
+            <Link to={`/edit/${show.id}`} className="button button--small">
               Изменить
-            </button>
+            </Link>
             <button
               type="button"
               className="button button--small button--danger"

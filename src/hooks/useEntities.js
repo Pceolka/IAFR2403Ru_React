@@ -55,8 +55,10 @@ export function useEntities() {
     setReloadKey((key) => key + 1);
   }, []);
 
+  // id может прийти из URL строкой ("/entity/5"), а у записей API он числовой —
+  // поэтому сравниваем строковые представления
   const getById = useCallback(
-    (id) => state.entities.find((entity) => entity.id === id) ?? null,
+    (id) => state.entities.find((entity) => String(entity.id) === String(id)) ?? null,
     [state.entities],
   );
 
